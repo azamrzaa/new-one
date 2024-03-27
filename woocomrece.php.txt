@@ -1,0 +1,42 @@
+<?php
+// WooCommerce API credentials
+$consumer_key = 'YOUR_CONSUMER_KEY';
+$consumer_secret = 'YOUR_CONSUMER_SECRET';
+$store_url = 'https://your-store-url.com/wp-json/wc/v3'; // Replace with your store's URL
+
+// Product ID for the product you want to retrieve the price for
+$product_id = 1; // Replace with your product's ID
+
+// Create a new cURL resource
+$ch = curl_init();
+
+// Set the cURL options
+curl_setopt($ch, CURLOPT_URL, "$store_url/products/$product_id");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    'Authorization: Basic ' . base64_encode("$consumer_key:$consumer_secret")
+));
+
+// Execute the cURL request
+$response = curl_exec($ch);
+
+// Check for cURL errors
+if (curl_errno($ch)) {
+    echo 'Curl error: ' . curl_error($ch);
+    exit;
+}
+
+// Close the cURL resource
+curl_close($ch);
+
+// Decode the JSON response
+$product_data = json_decode($response, true);
+
+// Check if the request was successful
+if (isset($product_data['id'])) {
+    $product_price = $product_data['price'];
+    echo "Product Price: $" . $product_price;
+} else {
+    echo "Product not found or error occurred.";
+}
+?>
